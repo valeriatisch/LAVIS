@@ -12,6 +12,9 @@ from lavis.common.dist_utils import main_process
 from lavis.common.registry import registry
 from lavis.tasks.base_task import BaseTask
 
+from pycocoevalcap.eval import COCOEvalCap
+from pycocotools.coco import COCO
+from torchvision.datasets.utils import download_url
 
 @registry.register_task("captioning")
 class CaptionTask(BaseTask):
@@ -84,7 +87,7 @@ class CaptionTask(BaseTask):
 
         # TODO better way to define this
         coco_gt_root = os.path.join(registry.get_path("cache_root"), "coco_gt")
-        coco_val = coco_caption_eval(coco_gt_root, eval_result_file, split_name)
+        coco_val = self.coco_caption_eval(coco_gt_root, eval_result_file, split_name)
 
         agg_metrics = coco_val.eval["CIDEr"] + coco_val.eval["Bleu_4"]
         log_stats = {split_name: {k: v for k, v in coco_val.eval.items()}}
@@ -99,44 +102,28 @@ class CaptionTask(BaseTask):
 
         return coco_res
 
+    def coco_caption_eval(self, coco_gt_root, results_file, split):
+        print(results_file)
+        
+        annotation_files = {
+            "val": "/hpi/fs00/share/fg-naumann/datasets/art/artpedia/artpedia_val_pycoco.json",
+            "test": "/hpi/fs00/share/fg-naumann/datasets/art/artpedia/artpedia_test_pycoco.json",
+        }
 
-# TODO better structure for this.
-from pycocoevalcap.eval import COCOEvalCap
-from pycocotools.coco import COCO
-from torchvision.datasets.utils import download_url
+        annotation_file = annotation_files[split]
+        # create coco object and coco_result object
+        coco = COCO(annotation_file)
+        coco_result = coco.loadRes(results_file)
 
+        # create coco_eval object by taking coco and coco_result
+        coco_eval = COCOEvalCap(coco, coco_result)  
 
-def coco_caption_eval(coco_gt_root, results_file, split):
-    urls = {
-        "val": "https://storage.googleapis.com/sfr-vision-language-research/datasets/coco_karpathy_val_gt.json",
-        "test": "https://storage.googleapis.com/sfr-vision-language-research/datasets/coco_karpathy_test_gt.json",
-    }
-    filenames = {
-        "val": "coco_karpathy_val_gt.json",
-        "test": "coco_karpathy_test_gt.json",
-    }
+        # evaluate results
+        # SPICE will take a few minutes the first time, but speeds up due to caching
+        coco_eval.evaluate()
 
-    download_url(urls[split], coco_gt_root)
-    annotation_file = os.path.join(coco_gt_root, filenames[split])
+        # print output evaluation scores
+        for metric, score in coco_eval.eval.items():
+            print(f"{metric}: {score:.3f}")
 
-    # create coco object and coco_result object
-    coco = COCO(annotation_file)
-    coco_result = coco.loadRes(results_file)
-
-    # create coco_eval object by taking coco and coco_result
-    coco_eval = COCOEvalCap(coco, coco_result)
-
-    # evaluate on a subset of images by setting
-    # coco_eval.params['image_id'] = coco_result.getImgIds()
-    # please remove this line when evaluating the full validation set
-    # coco_eval.params['image_id'] = coco_result.getImgIds()
-
-    # evaluate results
-    # SPICE will take a few minutes the first time, but speeds up due to caching
-    coco_eval.evaluate()
-
-    # print output evaluation scores
-    for metric, score in coco_eval.eval.items():
-        print(f"{metric}: {score:.3f}")
-
-    return coco_eval
+        return coco_eval
