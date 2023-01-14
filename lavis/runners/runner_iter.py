@@ -13,7 +13,7 @@ import time
 import torch
 import torch.distributed as dist
 import webdataset as wds
-from lavis.common.dist_utils import download_cached_file, is_main_process, main_process
+from lavis.common.dist_utils import download_cached_file, is_main_process, main_process, is_dist_avail_and_initialized
 from lavis.common.registry import registry
 from lavis.common.utils import is_url
 from lavis.datasets.data_utils import concat_datasets, reorg_datasets_by_split
@@ -125,7 +125,9 @@ class RunnerIter(RunnerBase):
 
             if self.evaluate_only:
                 break
-            dist.barrier()
+            
+            if is_dist_avail_and_initialized():
+                dist.barrier()
 
         # testing phase
         self.evaluate(cur_epoch=self.cur_epoch)
