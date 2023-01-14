@@ -45,7 +45,8 @@ class BaseDatasetBuilder:
         # only called on 1 GPU/TPU in distributed
 
         if is_main_process():
-            self._download_data()
+            #self._download_data()
+            pass
 
         if is_dist_avail_and_initialized():
             dist.barrier()
