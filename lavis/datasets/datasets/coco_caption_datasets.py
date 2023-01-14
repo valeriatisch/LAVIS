@@ -31,17 +31,18 @@ class COCOCapEvalDataset(CaptionEvalDataset):
         ann = self.annotation[index]
 
         image_path = os.path.join(self.vis_root, ann["image"])
+    
         image = Image.open(image_path).convert("RGB")
 
         image = self.vis_processor(image)
 
-        img_id = ann["image"].split("/")[-1].strip(".jpg").split("_")[-1]
 
         return {
             "image": image,
-            "image_id": img_id,
+            "image_id": ann["image_id"],
             "instance_id": ann["instance_id"],
         }
+
 
 
 class NoCapsEvalDataset(CaptionEvalDataset):

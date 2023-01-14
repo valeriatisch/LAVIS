@@ -10,7 +10,7 @@ from collections import OrderedDict
 
 from lavis.datasets.datasets.base_dataset import BaseDataset
 from PIL import Image
-
+Image.MAX_IMAGE_PIXELS = None
 
 class __DisplMixin:
     def displ_item(self, index):
