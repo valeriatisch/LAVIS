@@ -25,6 +25,7 @@ from lavis.common.dist_utils import (
 from lavis.common.registry import registry
 from lavis.common.utils import is_url
 from lavis.datasets.data_utils import concat_datasets, reorg_datasets_by_split
+from lavis.common.dist_utils import is_dist_avail_and_initialized
 from lavis.datasets.datasets.dataloader_utils import (
     IterLoader,
     MultiIterLoader,
@@ -383,7 +384,8 @@ class RunnerBase:
             if self.evaluate_only:
                 break
 
-            dist.barrier()
+            if is_dist_avail_and_initialized():        
+                dist.barrier()
 
         # testing phase
         test_epoch = "best" if len(self.valid_splits) > 0 else cur_epoch
