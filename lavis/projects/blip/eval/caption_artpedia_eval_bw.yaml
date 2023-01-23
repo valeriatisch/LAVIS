@@ -1,0 +1,40 @@
+ # Copyright (c) 2022, salesforce.com, inc.
+ # All rights reserved.
+ # SPDX-License-Identifier: BSD-3-Clause
+ # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+
+model:
+  arch: blip_caption
+  model_type: base_coco
+
+datasets:
+  artpedia: # name of the dataset builder
+    vis_processor:
+        eval:
+          name: "blip_image_eval"
+    text_processor:
+        eval:
+          name: "blip_caption"
+
+run:
+  # task: retrieval
+  task: captioning_artpedia
+  # optimizer
+  batch_size_train: 16
+  batch_size_eval: 32
+  num_workers: 1
+
+  max_len: 50
+  min_len: 7
+  num_beams: 7
+
+  seed: 42
+  output_dir: "output/BLIP/Artpedia"
+
+  evaluate: True
+  test_splits: ["test"]
+
+  device: "cuda"
+  world_size: 1
+  dist_url: "env://"
+  distributed: False
