@@ -8,7 +8,7 @@ model:
   model_type: base_coco
 
 datasets:
-  artpedia: # name of the dataset builder
+  artpediabw: # name of the dataset builder
     vis_processor:
         eval:
           name: "blip_image_eval"
