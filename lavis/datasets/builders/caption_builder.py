@@ -9,8 +9,9 @@ from lavis.datasets.builders.base_dataset_builder import BaseDatasetBuilder
 from lavis.datasets.datasets.coco_caption_datasets import (
     COCOCapDataset,
     COCOCapEvalDataset,
-    NoCapsEvalDataset,
+    NoCapsEvalDataset
 )
+from lavis.datasets.datasets.artpedia_filtered_dataset import FilterdArtpediaEvalDataset, FilteredArtpediaDataset
 
 from lavis.common.registry import registry
 from lavis.datasets.datasets.video_caption_datasets import (
@@ -26,6 +27,16 @@ class ArtpediaBuilder(BaseDatasetBuilder):
     DATASET_CONFIG_DICT = {
         "default" : "configs/datasets/artpedia/defaults_cap.yaml"
     }
+
+@registry.register_builder("artpedia_filtered")
+class ArtpediaFilteredBuilder(BaseDatasetBuilder):
+    train_dataset_cls = FilteredArtpediaDataset
+    eval_dataset_cls = FilterdArtpediaEvalDataset
+
+    DATASET_CONFIG_DICT = {
+        "default" : "configs/datasets/artpedia/filtered.yaml"
+    }
+
 
 @registry.register_builder("coco_caption")
 class COCOCapBuilder(BaseDatasetBuilder):
