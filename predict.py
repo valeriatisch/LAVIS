@@ -32,6 +32,7 @@ def predict_caption(raw_image, captioner, force_words = None):
         force_words_ids = model.tokenizer(force_words, add_special_tokens=False).input_ids
     image = vis_processors["eval"](raw_image).unsqueeze(0).to(device)    
     pred_captions = model.generate({"image": image}, use_nucleus_sampling=False, num_captions=3, num_beams = 3, force_words_ids = force_words_ids, max_length = 70)
+
     return pred_captions
 
 
@@ -74,7 +75,6 @@ def log_captions(captions: list[str], file_name: str):
     entries = [file_name]
     entries.extend(captions)
     with open(output_path / 'output.csv', 'a') as csvfile:
-        print(entries)
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(entries)
 
@@ -87,35 +87,19 @@ if __name__ == "__main__":
     text_matcher = load_model_and_preprocess(name="blip_image_text_matching", model_type="large", device=device, is_eval=True)
 
     images_labels = load_json_labels(json_path)
-    for file in [
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_100/vincent-van-gogh/216440-vincent-van-gogh.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_100/vincent-van-gogh/220010-vincent-van-gogh.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/2553-la-martiniquaise-the-martinique-woman/471435-2553-la-martiniquaise-the-martinique-woman.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_100/19th-and-early-20th-centuries-brochures/460064-19th-and-early-20th-centuries-brochures.jpg'), 
-        Path('/hpi/fs00/home/elena.gensch/765px-Paul_Gauguin_-_Upa_Upa_(The_Fire_Dance)_-_Google_Art_Project.jpg'), 
-        Path('/hpi/fs00/home/elena.gensch/Paul_Gauguin_-_Femmes_près_des_palmiers_(1891).jpg'), 
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/bulletin-de-la-vie-artistique/460899-bulletin-de-la-vie-artistique.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/outgoing-letter-to-boris/461441-outgoing-letter-to-boris.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/catalogue-raisonne-envelope-1/462656-catalogue-raisonne-envelope-1.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/les-cahiers-dart/460397-les-cahiers-dart.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/conversation-au-foyer/295285-conversation-au-foyer.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/branche-de-marronniers-en-fleurs-branch-of-a-flow/229790-branche-de-marronniers-en-fleurs-branch-of-a-flow.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/apres-le-bain/295515-apres-le-bain.jpg'),
-        Path('/hpi/fs00/share/fg-naumann/seminar-ws22-tagging-captioning-art/WPI-data/crawled_web_images/json_files/json_files_200/art-master-in-newsweek/229750-art-master-in-newsweek.jpg')
-    ]:
-    # for file in random.sample(list(img_path.glob(pattern = '**/*.png')), 10):
+    for file in random.sample(list(img_path.glob(pattern = '**/*.png')), 10):
         raw_image = Image.open(file)
 
-        captions = predict_caption(raw_image, captioner, ['in the background'])
+        captions = predict_caption(raw_image, captioner)
         log_captions(captions, file.name)
     
-        # references = images_labels[file.name]
+        references = images_labels[file.name]
 
         # concatenate all reference and caption attention images
-        # for caption in captions:
-        #     attention_img = visualize_attention(raw_image, text_matcher, caption)
+        for caption in captions:
+            attention_img = visualize_attention(raw_image, text_matcher, caption)
 
-        #     # make caption visible in image
-        #     Path(output_path / 'images' / file.stem).mkdir(parents=True, exist_ok=True)
-        #     img_name = '_'.join(caption.split(' ')) + '_attention.png'
-        #     pltimg.imsave(output_path / 'images' / file.stem / img_name, attention_img)
+            # make caption visible in image
+            Path(output_path / 'images' / file.stem).mkdir(parents=True, exist_ok=True)
+            img_name = '_'.join(caption.split(' ')) + '_attention.png'
+            pltimg.imsave(output_path / 'images' / file.stem / img_name, attention_img)

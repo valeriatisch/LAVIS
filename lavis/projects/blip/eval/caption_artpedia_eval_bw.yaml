@@ -24,9 +24,9 @@ run:
   batch_size_eval: 32
   num_workers: 1
 
-  max_len: 20
-  min_len: 5
-  num_beams: 3
+  max_len: 50
+  min_len: 7
+  num_beams: 7
 
   seed: 42
   output_dir: "output/BLIP/Artpedia"
