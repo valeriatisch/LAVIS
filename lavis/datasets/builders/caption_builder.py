@@ -38,6 +38,15 @@ class ArtpediaFilteredBuilder(BaseDatasetBuilder):
     }
 
 
+@registry.register_builder("artpediabw")
+class ArtpediaBuilder(BaseDatasetBuilder):
+    train_dataset_cls = COCOCapDataset
+    eval_dataset_cls = COCOCapEvalDataset
+
+    DATASET_CONFIG_DICT = {
+        "default" : "configs/datasets/artpedia/bw_cap.yaml"
+    }
+
 @registry.register_builder("coco_caption")
 class COCOCapBuilder(BaseDatasetBuilder):
     train_dataset_cls = COCOCapDataset

@@ -1325,6 +1325,7 @@ class XBertLMHeadDecoder(BertLMHeadModel):
         min_length=10,
         top_p=0.9,
         repetition_penalty=1.0,
+        force_words_ids=None,
         **kwargs
     ):
 
@@ -1353,6 +1354,7 @@ class XBertLMHeadDecoder(BertLMHeadModel):
                 eos_token_id=sep_token_id,
                 pad_token_id=pad_token_id,
                 repetition_penalty=1.1,
+                force_words_ids = force_words_ids,
                 **model_kwargs
             )
         else:
@@ -1365,6 +1367,8 @@ class XBertLMHeadDecoder(BertLMHeadModel):
                 eos_token_id=sep_token_id,
                 pad_token_id=pad_token_id,
                 repetition_penalty=repetition_penalty,
+                force_words_ids = force_words_ids,
+                length_penalty = 3.0,
                 **model_kwargs
             )
 

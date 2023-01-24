@@ -143,6 +143,7 @@ class BlipCaption(BlipBase):
         top_p=0.9,
         repetition_penalty=1.0,
         num_captions=1,
+        force_words_ids = None
     ):
         """
         Args:
@@ -196,6 +197,7 @@ class BlipCaption(BlipBase):
             min_length=min_length,
             top_p=top_p,
             repetition_penalty=repetition_penalty,
+            force_words_ids = force_words_ids
         )
 
         outputs = self.tokenizer.batch_decode(decoder_out, skip_special_tokens=True)
