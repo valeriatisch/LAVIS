@@ -7,7 +7,6 @@ import csv
 import random
 from PIL import Image, ImageOps
 from lavis.models import load_model_and_preprocess
-from bs4 import BeautifulSoup
 from matplotlib import pyplot as plt, image as pltimg
 from lavis.common.gradcam import getAttMap
 from lavis.models.blip_models.blip_image_text_matching import compute_gradcam
@@ -26,10 +25,14 @@ def load_image(img_url: str):
     return Image.open(requests.get(img_url, stream=True).raw).convert("RGB")
 
 
-def predict_caption(raw_image, captioner):
+def predict_caption(raw_image, captioner, force_words = None):
     model, vis_processors, text_processors = captioner
+    force_words_ids = None
+    if force_words:
+        force_words_ids = model.tokenizer(force_words, add_special_tokens=False).input_ids
     image = vis_processors["eval"](raw_image).unsqueeze(0).to(device)    
-    pred_captions = model.generate({"image": image}, use_nucleus_sampling=True, num_captions=3)
+    pred_captions = model.generate({"image": image}, use_nucleus_sampling=False, num_captions=3, num_beams = 3, force_words_ids = force_words_ids, max_length = 70)
+
     return pred_captions
 
 
