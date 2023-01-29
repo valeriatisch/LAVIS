@@ -45,17 +45,19 @@ class CaptionWPITask(CaptionTask):
 
         for syn in wordnet.synsets(token):
             for i in syn.lemma_names():
-                new_synonyms = i.name().split('_')
+                new_synonyms = i.split('_')
                 for synonym in new_synonyms:
                     if synonym not in self.stop_words:
-                        synonyms.append(self.ps.stem(synonym))
+                        synonyms.append(self.lemmatizer.lemmatize(synonym))
 
         return synonyms
 
 
     def synonym_extraction(self, token: str):
       synonyms = [token]
-      synonyms.extend(Synonyms(token).find_synonyms())
+      syn_finder = Synonyms(token)
+      syn_finder_words = syn_finder.find_synonyms()
+      synonyms.extend(syn_finder_words)
 
       return synonyms
 
@@ -65,7 +67,7 @@ class CaptionWPITask(CaptionTask):
         synonyms = set()
         for word in words:
             if any(char.isalpha() for char in word):
-              word_form = self.synonym_extraction(word)
+              word_form = self.synonym_extractor(word)
               for word_family_values in get_word_forms(word).values():
                 word_form.extend(list(word_family_values))
               synonyms.update(word_form)
@@ -85,12 +87,10 @@ class CaptionWPITask(CaptionTask):
     def wpi_caption_eval(self, reference, caption:str):
         try:
             words= [self.lemmatizer.lemmatize(toke) for toke in word_tokenize(caption) if toke not in self.stop_words]
-            print(words)
 
         except Exception as e:
             return None
         tag_synonyms_mapping = self.tags_synonyms(reference)
-        print(tag_synonyms_mapping)
         correct_count = 0
         sum = len(tag_synonyms_mapping.keys())
         if sum == 0:
@@ -98,7 +98,6 @@ class CaptionWPITask(CaptionTask):
         for tag, synonyms in tag_synonyms_mapping.items():
             if synonyms.intersection(words):
                 correct_count += 1
-                print(synonyms.intersection(words), 'tags: ', reference, 'caption: ', caption)
             
 
         return correct_count / sum
@@ -129,10 +128,9 @@ class CaptionWPITask(CaptionTask):
 
         for caption in val_result:
             single_acc = self.wpi_caption_eval(caption = caption["caption"], reference = caption["reference"])
-            if single_acc:
+            if single_acc is not None:
                 non_empty_refrences += 1
                 acc_accuracy += self.wpi_caption_eval(caption = caption["caption"], reference = caption["reference"])
-                print(acc_accuracy)
         score = acc_accuracy / non_empty_refrences
 
         self.writer.add_scalar('Synonym Accuracy', score, self.iteration)
