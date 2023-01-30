@@ -18,6 +18,9 @@ from lavis.datasets.datasets.video_caption_datasets import (
     VideoCaptionDataset,
     VideoCaptionEvalDataset,
 )
+from lavis.datasets.datasets.caption_wpi_datasets import (
+    WpiDataset
+)
 
 @registry.register_builder("artpedia")
 class ArtpediaBuilder(BaseDatasetBuilder):
@@ -93,4 +96,12 @@ class VATEXCapBuilder(BaseDatasetBuilder):
 
     DATASET_CONFIG_DICT = {
         "default": "configs/datasets/vatex/defaults_cap.yaml",
+    }
+
+@registry.register_builder("wpi_caption")
+class WPICapBuilder(BaseDatasetBuilder):
+    eval_dataset_cls = WpiDataset
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/wpi/defaults_cap.yaml",
     }
