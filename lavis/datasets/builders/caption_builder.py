@@ -34,7 +34,7 @@ class ArtpediaBuilder(BaseDatasetBuilder):
 @registry.register_builder("artpedia_filtered")
 class ArtpediaFilteredBuilder(BaseDatasetBuilder):
     train_dataset_cls = FilteredArtpediaDataset
-    eval_dataset_cls = FilterdArtpediaEvalDataset
+    eval_dataset_cls = COCOCapEvalDataset
 
     DATASET_CONFIG_DICT = {
         "default" : "configs/datasets/artpedia/filtered.yaml"
