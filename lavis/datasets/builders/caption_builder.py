@@ -21,6 +21,9 @@ from lavis.datasets.datasets.video_caption_datasets import (
 from lavis.datasets.datasets.caption_wpi_datasets import (
     WpiDataset
 )
+from lavis.datasets.datasets.artist_eval import (
+    CaptionEvalArtistDataset
+)
 
 @registry.register_builder("artpedia")
 class ArtpediaBuilder(BaseDatasetBuilder):
@@ -29,6 +32,14 @@ class ArtpediaBuilder(BaseDatasetBuilder):
 
     DATASET_CONFIG_DICT = {
         "default" : "configs/datasets/artpedia/defaults_cap.yaml"
+    }
+
+@registry.register_builder("artistEval")
+class ArtpediaBuilder(BaseDatasetBuilder):
+    eval_dataset_cls = CaptionEvalArtistDataset
+
+    DATASET_CONFIG_DICT = {
+        "default" : "configs/datasets/artpedia/artistEval.yaml"
     }
 
 @registry.register_builder("artpedia_filtered")
