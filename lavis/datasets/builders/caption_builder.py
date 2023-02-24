@@ -21,8 +21,8 @@ from lavis.datasets.datasets.video_caption_datasets import (
 from lavis.datasets.datasets.caption_wpi_datasets import (
     WpiDataset
 )
-from lavis.datasets.datasets.artist_eval import (
-    CaptionEvalArtistDataset
+from lavis.datasets.datasets.artpedia_artist import (
+    ArtistEvalDataset
 )
 
 @registry.register_builder("artpedia")
@@ -34,12 +34,12 @@ class ArtpediaBuilder(BaseDatasetBuilder):
         "default" : "configs/datasets/artpedia/defaults_cap.yaml"
     }
 
-@registry.register_builder("artistEval")
+@registry.register_builder("artpedia_artist")
 class ArtpediaBuilder(BaseDatasetBuilder):
-    eval_dataset_cls = CaptionEvalArtistDataset
+    eval_dataset_cls = ArtistEvalDataset
 
     DATASET_CONFIG_DICT = {
-        "default" : "configs/datasets/artpedia/artistEval.yaml"
+        "default" : "configs/datasets/artpedia/artist.yaml"
     }
 
 @registry.register_builder("artpedia_filtered")
@@ -52,7 +52,7 @@ class ArtpediaFilteredBuilder(BaseDatasetBuilder):
     }
 
 
-@registry.register_builder("artpediabw")
+@registry.register_builder("artpedia_bw")
 class ArtpediaBuilder(BaseDatasetBuilder):
     train_dataset_cls = COCOCapDataset
     eval_dataset_cls = COCOCapEvalDataset

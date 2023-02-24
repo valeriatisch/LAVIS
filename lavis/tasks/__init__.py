@@ -10,7 +10,7 @@ from lavis.tasks.base_task import BaseTask
 from lavis.tasks.captioning import CaptionTask
 from lavis.tasks.captioning_artpedia import CaptionArtpediaTask
 from lavis.tasks.captioning_wpi import CaptionWPITask
-from lavis.tasks.captioning_artist_eval import CaptionArtistTask
+from lavis.tasks.captioning_artist import CaptionArtistTask
 
 from lavis.tasks.image_text_pretrain import ImageTextPretrainTask
 from lavis.tasks.multimodal_classification import (
