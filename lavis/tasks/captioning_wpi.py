@@ -85,7 +85,7 @@ class CaptionWPITask(CaptionTask):
         synonyms = set()
         for word in words:
             if any(char.isalpha() for char in word):
-                synonyms = self.synonym_extractor(word)
+                synonyms.update(self.synonym_extractor(word))
                 synonyms.update(self.related_words(synonyms))
 
         return synonyms
