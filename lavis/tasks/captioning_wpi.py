@@ -7,7 +7,6 @@ import socket
 from datetime import datetime
 import nltk
 from nltk.tokenize import word_tokenize
-from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
 from functools import reduce
@@ -19,89 +18,117 @@ from nltk.stem import WordNetLemmatizer
 
 @registry.register_task("captioning_wpi")
 class CaptionWPITask(CaptionTask):
-    
     def __init__(self, num_beams, max_len, min_len, evaluate, report_metric=True):
-        super().__init__(num_beams, max_len, min_len, evaluate, report_metric
-        )
-        nltk.download('wordnet')
-        nltk.download('omw-1.4')
-        nltk.download('punkt')
-        nltk.download('stopwords')
+        super().__init__(num_beams, max_len, min_len, evaluate, report_metric)
+        """
+        Fetch 
+        - wordnet and omw-1.4 for extracting synonyms
+        - punkt for tokenizing
+        - stopwords for removing stopwords
+
+        Initialize lemmatizer, and stop words
+        """
+        nltk.download("wordnet")
+        nltk.download("omw-1.4")
+        nltk.download("punkt")
+        nltk.download("stopwords")
         self.writer = None
         self.iteration = 0
-        self.ps = PorterStemmer()
         self.lemmatizer = WordNetLemmatizer()
-        self.stop_words = set(stopwords.words('english'))
+        self.stop_words = set(stopwords.words("english"))
 
     def setup_writer(self):
+        """
+        Enable logging in tensorboard
+        """
+
         current_time = datetime.now().strftime("%b%d_%H-%M-%S")
-        log_dir_name =  os.path.join(registry.get_path("output_dir"),
-                "runs", current_time + socket.gethostname()
-            ) 
+        log_dir_name = os.path.join(
+            registry.get_path("output_dir"), "runs", current_time + socket.gethostname()
+        )
         self.writer = SummaryWriter(log_dir=log_dir_name)
 
     def synonym_extractor(self, token: str):
-        synonyms = [token]
+        """
+        Build set of synonyms from wordnet for a token
+        Remove stopwords
+        Apply lemmatization
+        """
+        synonyms = set()
 
         for syn in wordnet.synsets(token):
-            for i in syn.lemma_names():
-                new_synonyms = i.split('_')
-                for synonym in new_synonyms:
-                    if synonym not in self.stop_words:
-                        synonyms.append(self.lemmatizer.lemmatize(synonym))
+            synonyms.update(set(syn.lemma_names()))
 
+        synonyms -= set(self.stop_words)
+        synonyms = [self.lemmatizer.lemmatize(syn) for syn in synonyms]
+
+        synonyms.append(token)
         return synonyms
 
-
-    def synonym_extraction(self, token: str):
-      synonyms = [token]
-      syn_finder = Synonyms(token)
-      syn_finder_words = syn_finder.find_synonyms()
-      synonyms.extend(syn_finder_words)
-
-      return synonyms
-
+    def related_words(self, words: list):
+        """
+        Build list with all possible words forms for words
+        see get_word_forms (https://github.com/gutfeeling/word_forms)
+        """
+        related_words = list()
+        for word in words:
+            for word_family_values in get_word_forms(word).values():
+                related_words.extend(list(word_family_values))
+        return related_words
 
     def join_synonyms(self, tag: str):
+        """
+        Build Synonym list for included words in a tag
+        Synonym list consists of wordnet synonyms and the synonyms' related word forms
+        """
         words = word_tokenize(tag)
         synonyms = set()
         for word in words:
             if any(char.isalpha() for char in word):
-              word_form = self.synonym_extractor(word)
-              for word_family_values in get_word_forms(word).values():
-                word_form.extend(list(word_family_values))
-              synonyms.update(word_form)
-        
+                synonyms = self.synonym_extractor(word)
+                synonyms.update(self.related_words(synonyms))
+
         return synonyms
 
-
     def tags_synonyms(self, tags):
+        """
+        Build dictionary with tags as keys and corresponding synonyms as values
+        """
         tag_synonyms_mapping = {}
         for tag in tags:
             if tag:
-                tag_synonyms_mapping[tag] = self.join_synonyms(tag)        
+                tag_synonyms_mapping[tag] = self.join_synonyms(tag)
         return tag_synonyms_mapping
-    
 
-
-    def wpi_caption_eval(self, reference, caption:str):
+    def wpi_caption_eval(self, reference, caption: str):
+        """
+        wpi_caption_eval calculates similarity score between reference tags and caption
+        - Tokenize caption, remove stop words and lemmatize the remaining words
+        - Extract synonms for each tag and group them with corresponding tag
+        - Check for each tag group whether a word of the group is in the caption
+        - Calculate precision: matched tag groups / all tags
+        """
         try:
-            words= [self.lemmatizer.lemmatize(toke) for toke in word_tokenize(caption) if toke not in self.stop_words]
+            words = [
+                token
+                for token in word_tokenize(caption)
+                if token not in self.stop_words
+            ]
+            words = [self.lemmatizer.lemmatize(token) for token in words]
 
         except Exception as e:
             return None
         tag_synonyms_mapping = self.tags_synonyms(reference)
         correct_count = 0
-        sum = len(tag_synonyms_mapping.keys())
-        if sum == 0:
+        tag_num = len(tag_synonyms_mapping.keys())
+        if tag_num == 0:
             return None
         for tag, synonyms in tag_synonyms_mapping.items():
             if synonyms.intersection(words):
                 correct_count += 1
-            
 
-        return correct_count / sum
-    
+        return correct_count / tag_num
+
     def valid_step(self, model, samples):
         results = []
 
@@ -121,19 +148,28 @@ class CaptionWPITask(CaptionTask):
         return results
 
     def after_evaluation(self, val_result, split_name, epoch, **kwargs):
-        if(self.writer == None):
+        """
+        Provides implementation for score calcultation defined in the base_task
+        - Calculate precision for each caption in relation to reference tags
+        - Calculate average precision
+        """
+        if self.writer == None:
             self.setup_writer()
         acc_accuracy = 0.0
         non_empty_refrences = 0
 
         for caption in val_result:
-            single_acc = self.wpi_caption_eval(caption = caption["caption"], reference = caption["reference"])
+            single_acc = self.wpi_caption_eval(
+                caption=caption["caption"], reference=caption["reference"]
+            )
             if single_acc is not None:
                 non_empty_refrences += 1
-                acc_accuracy += self.wpi_caption_eval(caption = caption["caption"], reference = caption["reference"])
+                acc_accuracy += self.wpi_caption_eval(
+                    caption=caption["caption"], reference=caption["reference"]
+                )
         score = acc_accuracy / non_empty_refrences
 
-        self.writer.add_scalar('Synonym Accuracy', score, self.iteration)
+        self.writer.add_scalar("Synonym Accuracy", score, self.iteration)
         self.writer.flush()
-        
-        return {'synonym accuracy': score}
+
+        return {"synonym accuracy": score}
