@@ -10,7 +10,7 @@ model:
   load_finetuned: False
 
 datasets:
-  artpediabw: # name of the dataset builder
+  artpedia_bw: # name of the dataset builder
     vis_processor:
         train:
           name: "blip_image_train"

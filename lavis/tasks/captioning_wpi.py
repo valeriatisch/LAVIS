@@ -6,10 +6,6 @@ from lavis.common.registry import registry
 import socket
 from datetime import datetime
 import nltk
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-nltk.download('punkt')
-nltk.download('stopwords')
 from nltk.tokenize import word_tokenize
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
@@ -27,6 +23,10 @@ class CaptionWPITask(CaptionTask):
     def __init__(self, num_beams, max_len, min_len, evaluate, report_metric=True):
         super().__init__(num_beams, max_len, min_len, evaluate, report_metric
         )
+        nltk.download('wordnet')
+        nltk.download('omw-1.4')
+        nltk.download('punkt')
+        nltk.download('stopwords')
         self.writer = None
         self.iteration = 0
         self.ps = PorterStemmer()

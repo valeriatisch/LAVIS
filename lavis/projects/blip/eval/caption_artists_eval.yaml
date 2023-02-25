@@ -8,7 +8,7 @@ model:
   model_type: base_coco
 
 datasets:
-  artpedia_bw: # name of the dataset builder
+  artpedia_artist: # name of the dataset builder
     vis_processor:
         eval:
           name: "blip_image_eval"
@@ -18,7 +18,7 @@ datasets:
 
 run:
   # task: retrieval
-  task: captioning_artpedia
+  task: captioning_artist
   # optimizer
   batch_size_train: 16
   batch_size_eval: 32
@@ -29,7 +29,7 @@ run:
   num_beams: 7
 
   seed: 42
-  output_dir: "output/BLIP/Artpedia"
+  output_dir: "output/BLIP/Artpedia/artists_eval"
 
   evaluate: True
   test_splits: ["test"]
