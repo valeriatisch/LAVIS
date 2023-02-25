@@ -22,16 +22,17 @@ class ArtistEvalDataset(COCOCapEvalDataset):
         split (string): val or test
 
         Load annotations from annotation file
-        Build artist set, that includes all artists in the annotations
-        Format reference artist list
         """
         super().__init__(vis_processor, text_processor, vis_root, ann_paths)
+
+        #Build artist set including all artists
         artists = set()
         for ann in self.annotation:
             ann['artist'] = [name.lower() for name in ann['artist']]
             artists.update(ann['artist'])
         self.artists = list(artists)
 
+        # Format reference: add empty strings for not mentioned artists in the artist set
         for ann in self.annotation:
             ann['artist'] = [artist if artist in ann['artist'] else '' for artist in self.artists]
 
@@ -41,7 +42,6 @@ class ArtistEvalDataset(COCOCapEvalDataset):
 
         image_path = os.path.join(self.vis_root, ann["image"])
         image = Image.open(image_path).convert("RGB")
-        print(ann['image_id'], image_path)
 
         image = self.vis_processor(image)
         return {

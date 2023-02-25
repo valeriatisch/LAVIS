@@ -1,3 +1,7 @@
+"""
+Implements evaluation for generated captions: 
+Calculate a painting's scores for mentioned artists in relation to the ground truth artists
+"""
 import logging
 from lavis.tasks.captioning import CaptionTask
 from lavis.common.registry import registry
@@ -28,7 +32,6 @@ class CaptionArtistTask(CaptionTask):
         - Build pytorch dataset for the artist evaluation
         - Extract all artists part of the dataset (necessary for score eval)
         """
-        
         datasets = dict()
         
         datasets_config = cfg.datasets_cfg
@@ -62,7 +65,6 @@ class CaptionArtistTask(CaptionTask):
         - Infer caption for each sample in the validation dataset
         - Map each caption to the artist reference
         """
-
         results = []
 
         captions = model.generate(
@@ -87,7 +89,6 @@ class CaptionArtistTask(CaptionTask):
         - Receive f1-score, precision and recall for each artist and
           the corresponeding average for all artists
         """
-
         if(self.writer == None):
             self.setup_writer()
         captions = [self.included_artists(caption = sample['caption']) for sample in val_result]
@@ -110,7 +111,6 @@ class CaptionArtistTask(CaptionTask):
         """
         Results are written to the output runs folder specified in the config
         """
-
         with open (f'{self.writer.log_dir}/accuracy_report.json', 'w') as file:
             json.dump(metrics_report, file, indent = 4)
 
@@ -122,7 +122,7 @@ class CaptionArtistTask(CaptionTask):
     # if the string includes an artist the artist's name is appended to the list, an empty string is appended
     def included_artists(self, caption: str):
         """
-        Return list, with the included artists in the caption 
+        Build list, with the included artists in a caption 
         - All artists part of the datasets are considered for included artist
         """
         caption = caption.lower()
