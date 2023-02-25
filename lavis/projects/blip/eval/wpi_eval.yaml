@@ -29,7 +29,7 @@ run:
   num_beams: 3
 
   seed: 42
-  output_dir: "output/BLIP/Artpedia"
+  output_dir: "output/BLIP/Artpedia/WPI"
 
   evaluate: True
   test_splits: ["test"]
