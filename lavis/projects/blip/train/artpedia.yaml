@@ -36,7 +36,7 @@ run:
   batch_size_eval: 32
   num_workers: 1
 
-  max_len: 20
+  max_len: 50
   min_len: 5
   num_beams: 3
 
