@@ -1,11 +1,11 @@
 #!/bin/bash -eux
-#SBATCH --account=naumann
+#SBATCH --account=<ACCOUNT_NAME> # -A
 #SBATCH --job-name=filter
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=<MAIL>
-#SBATCH --partition=sorcery # -p
-#SBATCH --gpus=1
-#SBATCH --mem=48G
+#SBATCH --partition=<PARTITION_NAME> # -p
+#SBATCH --gpus=<NUMBER>
+#SBATCH --mem=<NUMBER>G
 
 # Initialize conda:
 eval "$(conda shell.bash hook)"
