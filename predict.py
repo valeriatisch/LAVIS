@@ -50,7 +50,6 @@ def parse_args():
     )
 
     args = parser.parse_args()
-    print(args.force_words)
     return args
 
 
@@ -154,7 +153,6 @@ def log_captions(captions: List[str], file_name: str):
     Path(output_path).mkdir(parents=True, exist_ok=True)
     entries = [file_name]
     entries.extend(captions)
-    print(entries)
     with open(output_path / "output.csv", "a") as csvfile:
         csvwriter = csv.writer(csvfile)
         csvwriter.writerow(entries)
