@@ -14,4 +14,4 @@ source activate blip
 set +eu
 
 # add optional arguments: --max_length=<integer>, --num_captions=<int>, --model_type=<str>, --use_nucleus_sampling=<bool>
-python predict.py --file_path=<str - path to image> -force_words <str list, e.g: 'a' 'wood'>
+python predict.py --image_path=<str> -force_words <str>

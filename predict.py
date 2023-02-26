@@ -32,7 +32,7 @@ output_path = Path("lavis/output/BLIP/caption_inference")
 def parse_args():
     parser = argparse.ArgumentParser(description="Inference")
 
-    parser.add_argument("--file_path", required=True, type=str)
+    parser.add_argument("--image_path", required=True, type=str)
     parser.add_argument("--max_length", required=False, default=30, type=int)
     parser.add_argument("--num_captions", required=False, default=3, type=int)
     parser.add_argument("--model_type", required=False, default="base_coco", type=str)
