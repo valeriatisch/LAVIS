@@ -154,3 +154,4 @@ debug*/
 *.gz
 
 cache/
+.idea/
