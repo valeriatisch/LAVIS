@@ -9,10 +9,8 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
-from functools import reduce
 import os
 from word_forms.word_forms import get_word_forms
-from wordhoard import Synonyms
 from nltk.stem import WordNetLemmatizer
 
 
@@ -68,7 +66,7 @@ class CaptionWPITask(CaptionTask):
     def related_words(self, words: list):
         """
         Build list with all possible words forms for words
-        see get_word_forms (https://github.com/gutfeeling/word_forms)
+        See get_word_forms (https://github.com/gutfeeling/word_forms)
         """
         related_words = list()
         for word in words:
@@ -78,7 +76,7 @@ class CaptionWPITask(CaptionTask):
 
     def join_synonyms(self, tag: str):
         """
-        Build Synonym list for included words in a tag
+        Build synonym list for included words in a tag
         Synonym list consists of wordnet synonyms and the synonyms' related word forms
         """
         words = word_tokenize(tag)
