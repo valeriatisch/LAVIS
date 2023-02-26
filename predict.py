@@ -47,6 +47,7 @@ def parse_args():
         dest="force_words",
         type=str,
         nargs="*",
+        help="usage: -force_words 'words' 'you want to' 'force'",
     )
 
     args = parser.parse_args()
@@ -169,7 +170,7 @@ if __name__ == "__main__":
         name="blip_image_text_matching", model_type="large", device=device, is_eval=True
     )
 
-    file = Path(args.file_path)
+    file = Path(args.image_path)
     raw_image = Image.open(file)
 
     captions = infer_caption(
