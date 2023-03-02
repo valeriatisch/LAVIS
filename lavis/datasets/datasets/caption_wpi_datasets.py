@@ -1,8 +1,6 @@
 import os
 import pandas as pd
-from torchvision.io import read_image
 from torch.utils.data import Dataset
-import tqdm
 from PIL import Image
 
 
@@ -13,7 +11,8 @@ class WpiDataset(Dataset):
             text_processor=None,
             vis_root=None,
             ann_paths=[],
-            label_name='Topics'):
+            label_name='Topics',
+            remove_documents=True):
         """
         Load annotations - Each annotation consists of:
         - otional: genres (e.g. ["notes (documents)"]), topics, places
@@ -27,6 +26,8 @@ class WpiDataset(Dataset):
         self.labels_array = self.labels()
         self.vis_processor = vis_processor
         self.text_processor = text_processor
+        if remove_documents:
+            self.remove_documents()
         if label_name == 'Genres':
             self.label_idx = 0
         elif label_name == 'Topics':
@@ -49,7 +50,24 @@ class WpiDataset(Dataset):
         return list(filtered_occ.keys())
 
     def __len__(self):
-        return len(self.anno_df)
+        return len(self.anno_df) 
+    
+    def remove_documents(self):
+        document_genres = ['notes (documents)', 'newspapers', 'books', 'newspaper columns', 'letters (correspondence)', 'autographs (manuscripts)', 'manuscripts (documents)', 'reports', 'sales catalogs', 'albums (books)', 'transcriptions (documents)', 'invoices', 'certificates', 'clippings (information artifacts)', 'receipts (financial records)', 'typescripts', 'publications (documents)', 'excerpts']
+        removed_indices = []
+        for idx in range(len(self.anno_df)):
+            genres = self.anno_df.iloc[idx, 0]
+            
+            # handle missing labels
+            if genres != genres:
+                genres = []
+
+            for genre in document_genres:
+                if genre in genres:
+                    removed_indices.append(idx)
+                    break
+        self.anno_df.drop(removed_indices, inplace=True)
+
 
     def __getitem__(self, idx):
         image_path = os.path.join(self.img_dir, self.anno_df.iloc[idx, 3])
