@@ -12,4 +12,4 @@ eval "$(conda shell.bash hook)"
 set +eu
 conda activate <ENV>
 set +eu
-python caption_matching.py
+python caption_matching.py path_to_images path_to_annotations_json path_to_annotations_json_with_scores

@@ -1,26 +1,24 @@
-import os
-from pathlib import Path
 import json
 import torch
+import argparse
 from PIL import Image
-from dotenv import load_dotenv
+from pathlib import Path
 
 from lavis.models import load_model_and_preprocess
 
-"""
-The script takes a path to a directory with images and a path
-to a json file with annotations defined in the .variables file.
-It then calculates matching scores and cosine similarities for
-each image-caption pair and saves the results in a new json file.
-"""
+# Define the command line arguments
+parser = argparse.ArgumentParser(description='Generate matching scores and cosine similarities for image-caption pairs')
+parser.add_argument('images_dir', type=str, help='path to the input directory containing the images')
+parser.add_argument('annotations_json', type=str, help='path to the json file with annotations')
+parser.add_argument('output_json', type=str, help='path to the output json file containing matching scores and cosine similarities')
+args = parser.parse_args()
 
-load_dotenv(".variables")
+IMG_PATH = Path(args.images_dir)
+JSON_PATH = Path(args.annotations_json)
+OUTPUT_JSON = Path(args.output_json)
 
-IMG_PATH = Path(os.getenv("IMAGES_PATH"))
-JSON_PATH = Path(os.getenv("JSON_ANNOTATIONS_PATH"))
+if __name__ == "__main__":
 
-
-def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load classifier for image text matching
@@ -60,9 +58,5 @@ def main():
         entry["cosine_similarity"] = cosine_similarity
         scored_annotations.append(entry)
 
-    with open(os.getenv("SCORED_JSON_ANNOTATIONS"), "w") as f:
+    with open(OUTPUT_JSON, "w") as f:
         json.dump(scored_annotations, f, indent=4)
-
-
-if __name__ == "__main__":
-    main()
