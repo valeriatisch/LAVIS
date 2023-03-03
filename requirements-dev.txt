@@ -26,3 +26,5 @@ webdataset
 wheel
 sentencepiece
 tensorboard
+Pillow
+python-dotenv
