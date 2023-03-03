@@ -7,6 +7,12 @@ from dotenv import load_dotenv
 
 from lavis.models import load_model_and_preprocess
 
+"""
+The script takes a path to a directory with images and a path
+to a json file with annotations defined in the .variables file.
+It then calculates matching scores and cosine similarities for
+each image-caption pair and saves the results in a new json file.
+"""
 
 load_dotenv(".variables")
 
@@ -14,8 +20,7 @@ IMG_PATH = Path(os.getenv("IMAGES_PATH"))
 JSON_PATH = Path(os.getenv("JSON_ANNOTATIONS_PATH"))
 
 
-if __name__ == "__main__":
-
+def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Load classifier for image text matching
@@ -57,3 +62,7 @@ if __name__ == "__main__":
 
     with open(os.getenv("SCORED_JSON_ANNOTATIONS"), "w") as f:
         json.dump(scored_annotations, f, indent=4)
+
+
+if __name__ == "__main__":
+    main()
