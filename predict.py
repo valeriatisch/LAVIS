@@ -27,8 +27,6 @@ from lavis.common.gradcam import getAttMap
 from lavis.models import load_model_and_preprocess
 from lavis.models.blip_models.blip_image_text_matching import compute_gradcam
 
-output_path = Path("lavis/output/BLIP/caption_inference")
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Inference")
@@ -76,6 +74,13 @@ def parse_args():
         type=str,
         nargs="*",
         help="usage: -force_words 'words' 'you want to' 'force'",
+    )
+    parser.add_argument(
+        "--output_path",
+        required=False,
+        default="lavis/output/BLIP/caption_inference",
+        type=str,
+        help="path to output folder",
     )
 
     args = parser.parse_args()
@@ -179,8 +184,8 @@ def visualize_attention(raw_image, img_text_matcher, caption):
     return avg_gradcam
 
 
-def log_captions(captions: List[str], file_name: str):
-    Path(output_path).mkdir(parents=True, exist_ok=True)
+def log_captions(captions: List[str], file_name: str, output_path: Path):
+    output_path.mkdir(parents=True, exist_ok=True)
     entries = [file_name]
     entries.extend(captions)
     with open(output_path / "output.csv", "a") as csvfile:
@@ -200,6 +205,7 @@ if __name__ == "__main__":
     )
 
     file = Path(args.image_path)
+    output_path = Path(args.output_path)
     raw_image = Image.open(file)
 
     captions = infer_caption(
@@ -210,7 +216,7 @@ if __name__ == "__main__":
         use_nucleus_sampling=args.use_nucleus_sampling,
         num_captions=args.num_captions,
     )
-    log_captions(captions, file.name)
+    log_captions(captions, file.name, output_path)
 
     for caption in captions:
         attention_img = visualize_attention(raw_image, img_text_matcher, caption)
