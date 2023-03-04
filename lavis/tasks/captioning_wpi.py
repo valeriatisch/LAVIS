@@ -7,7 +7,7 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
-import os
+from pathlib import Path
 from word_forms.word_forms import get_word_forms
 from nltk.stem import WordNetLemmatizer
 
@@ -15,15 +15,16 @@ from nltk.stem import WordNetLemmatizer
 @registry.register_task("captioning_wpi")
 class CaptionWPITask(CaptionTask):
     def __init__(self, num_beams, max_len, min_len, evaluate, report_metric=True):
-        super().__init__(num_beams, max_len, min_len, evaluate, report_metric)
         """
-        Fetch 
+        Fetch
         - wordnet and omw-1.4 for extracting synonyms
         - punkt for tokenizing
         - stopwords for removing stopwords
 
         Initialize lemmatizer, and stop words
         """
+        super().__init__(num_beams, max_len, min_len, evaluate, report_metric)
+
         nltk.download("wordnet")
         nltk.download("omw-1.4")
         nltk.download("punkt")
@@ -39,10 +40,9 @@ class CaptionWPITask(CaptionTask):
         """
 
         current_time = datetime.now().strftime("%b%d_%H-%M-%S")
-        log_dir_name = os.path.join(
-            registry.get_path("output_dir"), "runs", current_time + socket.gethostname()
-        )
-        self.writer = SummaryWriter(log_dir=log_dir_name)
+        log_dir= Path(registry.get_path("output_dir")) / "runs" / (current_time + socket.gethostname())
+        
+        self.writer = SummaryWriter(log_dir=str(log_dir))
 
     def synonym_extractor(self, token: str):
         """
@@ -61,12 +61,12 @@ class CaptionWPITask(CaptionTask):
         synonyms.append(token)
         return synonyms
 
-    def related_words(self, words: list):
+    def related_words(self, words: set):
         """
         Build list with all possible words forms for words
         See get_word_forms (https://github.com/gutfeeling/word_forms)
         """
-        related_words = list()
+        related_words = []
         for word in words:
             for word_family_values in get_word_forms(word).values():
                 related_words.extend(list(word_family_values))
@@ -86,7 +86,7 @@ class CaptionWPITask(CaptionTask):
 
         return synonyms
 
-    def tags_synonyms(self, tags):
+    def get_tags_synonyms(self, tags):
         """
         Build dictionary with tags as keys and corresponding synonyms as values
         """
@@ -106,20 +106,19 @@ class CaptionWPITask(CaptionTask):
         """
         try:
             words = [
-                token
+                self.lemmatizer.lemmatize(token)
                 for token in word_tokenize(caption)
                 if token not in self.stop_words
             ]
-            words = [self.lemmatizer.lemmatize(token) for token in words]
 
         except Exception:
             return None
-        tag_synonyms_mapping = self.tags_synonyms(reference)
+        tag_synonyms_mapping = self.get_tags_synonyms(reference)
         correct_count = 0
         tag_num = len(tag_synonyms_mapping.keys())
         if tag_num == 0:
             return None
-        for tag, synonyms in tag_synonyms_mapping.items():
+        for synonyms in tag_synonyms_mapping.values():
             if synonyms.intersection(words):
                 correct_count += 1
 
@@ -145,25 +144,23 @@ class CaptionWPITask(CaptionTask):
 
     def after_evaluation(self, val_result, split_name, epoch, **kwargs):
         """
-        Provides implementation for score calcultation defined in the base_task
+        Provides implementation for score calculation defined in the base_task
         - Calculate precision for each caption in relation to reference tags
         - Calculate average precision
         """
         if self.writer is None:
             self.setup_writer()
         acc_accuracy = 0.0
-        non_empty_refrences = 0
+        non_empty_references = 0
 
         for caption in val_result:
             single_acc = self.wpi_caption_eval(
                 caption=caption["caption"], reference=caption["reference"]
             )
             if single_acc is not None:
-                non_empty_refrences += 1
-                acc_accuracy += self.wpi_caption_eval(
-                    caption=caption["caption"], reference=caption["reference"]
-                )
-        score = acc_accuracy / non_empty_refrences
+                non_empty_references += 1
+                acc_accuracy += single_acc
+        score = acc_accuracy / non_empty_references
 
         self.writer.add_scalar("Synonym Accuracy", score, self.iteration)
         self.writer.flush()
