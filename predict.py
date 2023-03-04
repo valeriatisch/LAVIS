@@ -133,24 +133,25 @@ def infer_caption(
     return pred_captions
 
 
-def adjust_img_att(raw_image, gray_scale: bool = True):
+def adjust_img_att(image, gray_scale: bool = True):
     """
     This method prepares the raw image lying under the attention map
-    - Optinally Grayscale image (for better visualization)
+    - Optionally Grayscale image (for better visualization)
     - Adjust image size to preprocessing within BLIP
     - Normalize image values (result: between 0 and 1)
     """
     if gray_scale:
-        gray = ImageOps.grayscale(raw_image)
+        image = ImageOps.grayscale(image)
     dst_w = 720
-    w, h = raw_image.size
+    w, h = image.size
     scaling_factor = dst_w / w
 
-    resized_img = gray.resize((int(w * scaling_factor), int(h * scaling_factor)))
+    resized_img = image.resize((int(w * scaling_factor), int(h * scaling_factor)))
     norm_img = np.float32(resized_img) / 255
 
-    # Adjust array to have 3 color channels
-    norm_img = np.stack((norm_img,) * 3, axis=-1)
+    # Adjust array to have 3 color channels if it is grayscale
+    if gray_scale:
+        norm_img = np.stack((norm_img,) * 3, axis=-1)
     return norm_img
 
 
