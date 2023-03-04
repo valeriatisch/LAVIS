@@ -51,6 +51,20 @@ class ArtpediaFilteredBuilder(BaseDatasetBuilder):
         "default" : "configs/datasets/artpedia/filtered.yaml"
     }
 
+    def build_dataset_class(self, vis_processor, text_processor, ann_paths, vis_path, is_train):
+        filtering_threshold = self.config.get("filtering_threshold")
+        dataset_cls = self.train_dataset_cls if is_train else self.eval_dataset_cls
+        if is_train:
+            return dataset_cls(
+                    vis_processor=vis_processor,
+                    text_processor=text_processor,
+                    ann_paths=ann_paths,
+                    vis_root=vis_path,
+                    filtering_threshold=filtering_threshold
+                )
+        else:
+            return super().build_dataset_class(vis_processor, text_processor, ann_paths, vis_path, is_train)
+
 
 @registry.register_builder("artpedia_bw")
 class ArtpediaBuilder(BaseDatasetBuilder):

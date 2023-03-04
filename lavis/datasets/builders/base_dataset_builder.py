@@ -214,16 +214,18 @@ class BaseDatasetBuilder:
                 warnings.warn("storage path {} does not exist.".format(vis_path))
 
             # create datasets
-            dataset_cls = self.train_dataset_cls if is_train else self.eval_dataset_cls
-            datasets[split] = dataset_cls(
+            datasets[split] = self.build_dataset_class(vis_processor, text_processor, ann_paths, vis_path, is_train)
+
+        return datasets
+
+    def build_dataset_class(self, vis_processor, text_processor, ann_paths, vis_path, is_train):
+        dataset_cls = self.train_dataset_cls if is_train else self.eval_dataset_cls
+        return dataset_cls(
                 vis_processor=vis_processor,
                 text_processor=text_processor,
                 ann_paths=ann_paths,
                 vis_root=vis_path,
             )
-
-        return datasets
-
 
 def load_dataset_config(cfg_path):
     cfg = OmegaConf.load(cfg_path).datasets

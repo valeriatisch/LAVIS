@@ -11,6 +11,7 @@ model:
 
 datasets:
   artpedia_filtered: # name of the dataset builder
+    filtering_threshold: 0.8
     vis_processor:
         train:
           name: "blip_image_train"
