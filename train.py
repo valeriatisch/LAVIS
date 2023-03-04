@@ -20,7 +20,16 @@ from lavis.common.registry import registry
 from lavis.common.utils import now
 
 
-# imports modules for registration
+# imports modules for registration: keep this so that registration is performed correctly
+from lavis.datasets.builders import *
+from lavis.models import *
+from lavis.processors import *
+from lavis.runners import *
+from lavis.tasks import *
+from lavis.common.optims import (
+    LinearWarmupCosineLRScheduler,
+    LinearWarmupStepLRScheduler,
+)
 
 
 def parse_args():
