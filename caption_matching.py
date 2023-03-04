@@ -7,10 +7,20 @@ from pathlib import Path
 from lavis.models import load_model_and_preprocess
 
 # Define the command line arguments
-parser = argparse.ArgumentParser(description='Generate matching scores and cosine similarities for image-caption pairs')
-parser.add_argument('images_dir', type=str, help='path to the input directory containing the images')
-parser.add_argument('annotations_json', type=str, help='path to the json file with annotations')
-parser.add_argument('output_json', type=str, help='path to the output json file containing matching scores and cosine similarities')
+parser = argparse.ArgumentParser(
+    description="Generate matching scores and cosine similarities for image-caption pairs"
+)
+parser.add_argument(
+    "images_dir", type=str, help="path to the input directory containing the images"
+)
+parser.add_argument(
+    "annotations_json", type=str, help="path to the json file with annotations"
+)
+parser.add_argument(
+    "output_json",
+    type=str,
+    help="path to the output json file containing matching scores and cosine similarities",
+)
 args = parser.parse_args()
 
 IMG_PATH = Path(args.images_dir)

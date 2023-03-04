@@ -7,9 +7,7 @@ from lavis.tasks.captioning import CaptionTask
 from lavis.common.registry import registry
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
-from lavis.common.registry import registry
 import socket
-from datetime import datetime
 import os
 from sklearn.metrics import classification_report
 from operator import itemgetter
@@ -18,10 +16,8 @@ import json
 
 @registry.register_task("captioning_artist")
 class CaptionArtistTask(CaptionTask):
-    
     def __init__(self, num_beams, max_len, min_len, evaluate, report_metric=True):
-        super().__init__(num_beams, max_len, min_len, evaluate, report_metric
-        )
+        super().__init__(num_beams, max_len, min_len, evaluate, report_metric)
         self.writer = None
         self.iteration = 0
 
@@ -33,7 +29,7 @@ class CaptionArtistTask(CaptionTask):
         - Extract all artists part of the dataset (necessary for score eval)
         """
         datasets = dict()
-        
+
         datasets_config = cfg.datasets_cfg
 
         assert len(datasets_config) > 0, "At least one dataset has to be specified."
@@ -43,20 +39,19 @@ class CaptionArtistTask(CaptionTask):
 
             builder = registry.get_builder_class(name)(dataset_config)
             dataset = builder.build_datasets()
-            
+
             datasets[name] = dataset
-            self.artists = dataset['test'].artists
+            self.artists = dataset["test"].artists
 
-            logging.info(f'The dataset consists of {len(self.artists)} artists')
-
+            logging.info(f"The dataset consists of {len(self.artists)} artists")
 
         return datasets
 
     def setup_writer(self):
         current_time = datetime.now().strftime("%b%d_%H-%M-%S")
-        log_dir_name =  os.path.join(registry.get_path("output_dir"),
-                "runs", current_time + socket.gethostname()
-            ) 
+        log_dir_name = os.path.join(
+            registry.get_path("output_dir"), "runs", current_time + socket.gethostname()
+        )
         self.writer = SummaryWriter(log_dir=log_dir_name)
 
     def valid_step(self, model, samples):
@@ -75,8 +70,8 @@ class CaptionArtistTask(CaptionTask):
         )
 
         references = samples["artists"]
-        
-        for idx,caption in enumerate(captions):
+
+        for idx, caption in enumerate(captions):
             reference = list(map(itemgetter(idx), references))
             results.append({"caption": caption, "reference": reference})
         return results
@@ -89,19 +84,25 @@ class CaptionArtistTask(CaptionTask):
         - Receive f1-score, precision and recall for each artist and
           the corresponeding average for all artists
         """
-        if(self.writer == None):
+        if self.writer is None:
             self.setup_writer()
-        captions = [self.included_artists(caption = sample['caption']) for sample in val_result]
-        references = [sample['reference'] for sample in val_result]
-        caption_vectors = flatten(captions)       
+        captions = [
+            self.included_artists(caption=sample["caption"]) for sample in val_result
+        ]
+        references = [sample["reference"] for sample in val_result]
+        caption_vectors = flatten(captions)
         reference_vectors = flatten(references)
-        non_empty_captions, non_empty_references = filter_empty_artists(reference_vectors=reference_vectors, caption_vectors=caption_vectors)
+        non_empty_captions, non_empty_references = filter_empty_artists(
+            reference_vectors=reference_vectors, caption_vectors=caption_vectors
+        )
 
         # classification_report calculates precision, recall, f1score (totally and for each artist)
-        metrics_report = classification_report(y_true = non_empty_references, y_pred = non_empty_captions, output_dict = True)
+        metrics_report = classification_report(
+            y_true=non_empty_references, y_pred=non_empty_captions, output_dict=True
+        )
 
-        result = metrics_report['macro avg']
-        result['accuracy'] = metrics_report['accuracy']
+        result = metrics_report["macro avg"]
+        result["accuracy"] = metrics_report["accuracy"]
 
         self.write_results(metrics_report, result)
 
@@ -111,22 +112,24 @@ class CaptionArtistTask(CaptionTask):
         """
         Results are written to the output runs folder specified in the config
         """
-        with open (f'{self.writer.log_dir}/accuracy_report.json', 'w') as file:
-            json.dump(metrics_report, file, indent = 4)
+        with open(f"{self.writer.log_dir}/accuracy_report.json", "w") as file:
+            json.dump(metrics_report, file, indent=4)
 
         for metric, score in result.items():
             self.writer.add_scalar(metric, score, self.iteration)
-        
+
         logging.info(json.dumps(result, indent=4))
-    
+
     # if the string includes an artist the artist's name is appended to the list, an empty string is appended
     def included_artists(self, caption: str):
         """
-        Build list, with the included artists in a caption 
+        Build list, with the included artists in a caption
         - All artists part of the datasets are considered for included artist
         """
         caption = caption.lower()
-        caption_vector = [ artist if artist in caption else '' for artist in self.artists]
+        caption_vector = [
+            artist if artist in caption else "" for artist in self.artists
+        ]
         return caption_vector
 
 

@@ -33,13 +33,40 @@ output_path = Path("lavis/output/BLIP/caption_inference")
 def parse_args():
     parser = argparse.ArgumentParser(description="Inference")
 
-    parser.add_argument("--image_path", required=True, type=str)
-    parser.add_argument("--max_length", required=False, default=30, type=int)
-    parser.add_argument("--num_captions", required=False, default=3, type=int)
-    parser.add_argument("--model_type", required=False, default="base_coco", type=str)
+    parser.add_argument(
+        "--image_path",
+        required=True,
+        type=str,
+        help="path to image that should be captioned",
+    )
+    parser.add_argument(
+        "--max_length",
+        required=False,
+        default=30,
+        type=int,
+        help="maximum length of generated caption",
+    )
+    parser.add_argument(
+        "--num_captions",
+        required=False,
+        default=3,
+        type=int,
+        help="number of generated captions",
+    )
+    parser.add_argument(
+        "--model_type",
+        required=False,
+        default="base_coco",
+        type=str,
+        help="model type to be used for captioning",
+    )
 
     parser.add_argument(
-        "--use_nucleus_sampling", required=False, default=True, type=bool
+        "--use_nucleus_sampling",
+        required=False,
+        default=True,
+        type=bool,
+        help="use nucleaus sampling for caption generation",
     )
     parser.add_argument(
         "-force_words",
@@ -64,12 +91,12 @@ def load_image(img_url: str):
 
 
 def infer_caption(
-        raw_image,
-        captioner,
-        force_words: Optional[List[str]] = None,
-        max_length: int = 50,
-        use_nucleus_sampling: bool = True,
-        num_captions: int = 3,
+    raw_image,
+    captioner,
+    force_words: Optional[List[str]] = None,
+    max_length: int = 50,
+    use_nucleus_sampling: bool = True,
+    num_captions: int = 3,
 ):
     """
     Generates captions for a sample image
@@ -78,7 +105,7 @@ def infer_caption(
     - Prepare the image as model input using the associated processors
     - Model generates multiple captions if nucleus sampling and one caption if beam search
     """
-    model, vis_processors, text_processors = captioner
+    model, vis_processors, _ = captioner
 
     force_words_ids = None
     if force_words:
@@ -146,7 +173,7 @@ def visualize_attention(raw_image, img_text_matcher, caption):
     avg_gradcam = getAttMap(norm_img, gradcam[0][1], blur=True)
     # Normalize added value from attention
     avg_gradcam = (avg_gradcam - avg_gradcam.min()) / (
-            avg_gradcam.max() - avg_gradcam.min()
+        avg_gradcam.max() - avg_gradcam.min()
     )
     return avg_gradcam
 

@@ -2,9 +2,7 @@ from lavis.tasks.captioning import CaptionTask
 from lavis.common.registry import registry
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
-from lavis.common.registry import registry
 import socket
-from datetime import datetime
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -114,7 +112,7 @@ class CaptionWPITask(CaptionTask):
             ]
             words = [self.lemmatizer.lemmatize(token) for token in words]
 
-        except Exception as e:
+        except Exception:
             return None
         tag_synonyms_mapping = self.tags_synonyms(reference)
         correct_count = 0
@@ -151,7 +149,7 @@ class CaptionWPITask(CaptionTask):
         - Calculate precision for each caption in relation to reference tags
         - Calculate average precision
         """
-        if self.writer == None:
+        if self.writer is None:
             self.setup_writer()
         acc_accuracy = 0.0
         non_empty_refrences = 0

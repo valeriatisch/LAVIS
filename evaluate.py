@@ -59,8 +59,6 @@ def main():
 
     cfg = Config(parse_args())
 
-    # init_distributed_mode(cfg.run_cfg)
-
     setup_seeds(cfg)
 
     # set after init_distributed_mode() to only log on master.
