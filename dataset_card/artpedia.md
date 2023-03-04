@@ -20,4 +20,5 @@ Models are typically evaluated according to a [BLEU](https://aclanthology.org/P0
 
 
 ## References
-Artpedia: A New Visual-Semantic Dataset with Visual and Contextual Sentences; Stefanini, Matteo and Cornia, Marcella and Baraldi, Lorenzo and Corsini, Massimiliano and Cucchiara, Rita; Proceedings of the International Conference on Image Analysis and Processing;2019
+Artpedia: A New Visual-Semantic Dataset with Visual and Contextual Sentences; Stefanini, Matteo and Cornia, Marcella and Baraldi, Lorenzo and Corsini, Massimiliano and Cucchiara, Rita; Proceedings of the International Conference on Image Analysis and Processing; 2019
+
