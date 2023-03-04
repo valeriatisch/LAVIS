@@ -193,9 +193,8 @@ def log_captions(captions: List[str], file_name: str, output_path: Path):
         csvwriter.writerow(entries)
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # loads BLIP caption base model, with finetuned checkpoints on MSCOCO captioning dataset.
     captioner = load_model_and_preprocess(
         name="blip_caption", model_type=args.model_type, is_eval=True, device=device
@@ -224,3 +223,7 @@ if __name__ == "__main__":
         Path(output_path / "images" / file.stem).mkdir(parents=True, exist_ok=True)
         img_name = "_".join(caption.split(" ")) + "_attention.png"
         pltimg.imsave(output_path / "images" / file.stem / img_name, attention_img)
+
+if __name__ == "__main__":
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    main()
