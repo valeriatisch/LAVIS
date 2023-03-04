@@ -14,20 +14,10 @@ import torch.backends.cudnn as cudnn
 
 import lavis.tasks as tasks
 from lavis.common.config import Config
-from lavis.common.dist_utils import get_rank, init_distributed_mode
+from lavis.common.dist_utils import get_rank
 from lavis.common.logger import setup_logger
-from lavis.common.optims import (
-    LinearWarmupCosineLRScheduler,
-    LinearWarmupStepLRScheduler,
-)
 from lavis.common.utils import now
-
-# imports modules for registration
-from lavis.datasets.builders import *
-from lavis.models import *
-from lavis.processors import *
 from lavis.runners.runner_base import RunnerBase
-from lavis.tasks import *
 
 
 def parse_args():
@@ -38,8 +28,8 @@ def parse_args():
         "--options",
         nargs="+",
         help="override some settings in the used config, the key-value pair "
-        "in xxx=yyy format will be merged into config file (deprecate), "
-        "change to --cfg-options instead.",
+             "in xxx=yyy format will be merged into config file (deprecate), "
+             "change to --cfg-options instead.",
     )
 
     args = parser.parse_args()

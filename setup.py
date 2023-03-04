@@ -5,8 +5,9 @@
  For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 """
 
-from setuptools import setup, find_namespace_packages
 import platform
+
+from setuptools import setup, find_namespace_packages
 
 DEPENDENCY_LINKS = []
 if platform.system() == "Windows":
