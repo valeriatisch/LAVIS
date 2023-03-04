@@ -23,7 +23,7 @@ class WpiDataset(Dataset):
         self.anno_df = pd.read_json(annotations_file)
         self.img_dir = vis_root
         self.label_name = label_name
-        self.labels_array = self.labels()
+        self.labels_array = self.get_labels()
         self.vis_processor = vis_processor
         self.text_processor = text_processor
         if label_name == "Genres":
@@ -37,9 +37,9 @@ class WpiDataset(Dataset):
                 "Must supply a valid label_name. Options are: Genres, Topics or Places"
             )
 
-    def labels(self):
+    def get_labels(self):
         occurrences = dict()
-        for _, labels in self.anno_df[self.label_name].dropna().items():
+        for labels in self.anno_df[self.label_name].dropna().values():
             for label in labels:
                 occurrences[label] = (
                     occurrences[label] + 1 if occurrences.get(label) is not None else 1
@@ -59,7 +59,7 @@ class WpiDataset(Dataset):
         image = self.vis_processor(image)
         labels = self.anno_df.iloc[idx, self.label_idx]
 
-        # handle missing labels
+        # handle missing labels (check if lables is NaN because NaN != NaN )
         if labels != labels:
             labels = []
 
