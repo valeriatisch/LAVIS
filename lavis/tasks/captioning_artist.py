@@ -2,16 +2,18 @@
 Implements evaluation for generated captions: 
 Calculate a painting's scores for mentioned artists in relation to the ground truth artists
 """
-import logging
-from lavis.tasks.captioning import CaptionTask
-from lavis.common.registry import registry
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
-import socket
-import os
-from sklearn.metrics import classification_report
-from operator import itemgetter
 import json
+import logging
+import os
+import socket
+from datetime import datetime
+from operator import itemgetter
+
+from sklearn.metrics import classification_report
+from torch.utils.tensorboard import SummaryWriter
+
+from lavis.common.registry import registry
+from lavis.tasks.captioning import CaptionTask
 
 
 @registry.register_task("captioning_artist")

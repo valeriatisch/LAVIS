@@ -1,9 +1,11 @@
-from lavis.tasks.captioning import CaptionTask
-from lavis.common.registry import registry
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
-import socket
 import os
+import socket
+from datetime import datetime
+
+from torch.utils.tensorboard import SummaryWriter
+
+from lavis.common.registry import registry
+from lavis.tasks.captioning import CaptionTask
 
 
 @registry.register_task("captioning_artpedia")

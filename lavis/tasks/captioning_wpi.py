@@ -1,15 +1,17 @@
-from lavis.tasks.captioning import CaptionTask
-from lavis.common.registry import registry
-from torch.utils.tensorboard import SummaryWriter
-from datetime import datetime
 import socket
+from datetime import datetime
+from pathlib import Path
+
 import nltk
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.corpus import wordnet
-from pathlib import Path
-from word_forms.word_forms import get_word_forms
 from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+from torch.utils.tensorboard import SummaryWriter
+from word_forms.word_forms import get_word_forms
+
+from lavis.common.registry import registry
+from lavis.tasks.captioning import CaptionTask
 
 
 @registry.register_task("captioning_wpi")
@@ -40,8 +42,8 @@ class CaptionWPITask(CaptionTask):
         """
 
         current_time = datetime.now().strftime("%b%d_%H-%M-%S")
-        log_dir= Path(registry.get_path("output_dir")) / "runs" / (current_time + socket.gethostname())
-        
+        log_dir = Path(registry.get_path("output_dir")) / "runs" / (current_time + socket.gethostname())
+
         self.writer = SummaryWriter(log_dir=str(log_dir))
 
     def synonym_extractor(self, token: str):
