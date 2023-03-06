@@ -1,11 +1,11 @@
 #!/bin/bash -eux
 #SBATCH --job-name=captioning
 #SBATCH --mail-type=END,FAIL
-#SBATCH --mail-user=smilla.fox@student.hpi.uni-potsdam.de
-#SBATCH --partition=sorcery # -p
-#SBATCH --gpus=1
-#SBATCH --account=naumann # -A
-#SBATCH --mem=48G
+#SBATCH --mail-user=<EMAIL>
+#SBATCH --partition=<PARTITION_NAME> # -p
+#SBATCH --gpus=<NUMBER>
+#SBATCH --account=<ACCOUNT_NAME> # -A
+#SBATCH --mem=<NUMBER>G
  
 # Initialize conda:
 eval "$(conda shell.bash hook)"
