@@ -224,6 +224,7 @@ def main():
         img_name = "_".join(caption.split(" ")) + "_attention.png"
         pltimg.imsave(output_path / "images" / file.stem / img_name, attention_img)
 
+
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     main()
