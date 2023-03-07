@@ -15,8 +15,8 @@ datasets:
         train:
           storage: path/artpedia_res_scored_train.json
         val:
-          storage:  path/artpedia_val_coco_new.json
+          storage:  path/to/local/artpedia_val_coco_new.json
         test:
-          storage: path/artpedia_test_coco_new.json
+          storage: path/to/local/artpedia_test_coco_new.json
       images:
-        storage: path/artpedia-data/images
+        storage: path/to/local/artpedia-data/images

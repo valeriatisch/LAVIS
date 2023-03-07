@@ -106,8 +106,8 @@ class CaptionTask(BaseTask):
         print(results_file)
         
         annotation_files = {
-            "val": "path/artpedia_val_pycoco.json",
-            "test": "path/artpedia_test_pycoco.json",
+            "val": "path/to/local/artpedia_val_pycoco.json",
+            "test": "path/to/local/artpedia_test_pycoco.json",
         }
 
         annotation_file = annotation_files[split]
