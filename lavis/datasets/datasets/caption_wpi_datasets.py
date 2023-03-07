@@ -39,7 +39,7 @@ class WpiDataset(Dataset):
 
     def get_labels(self):
         occurrences = dict()
-        for labels in self.anno_df[self.label_name].dropna().values():
+        for _, labels in self.anno_df[self.label_name].dropna().items():
             for label in labels:
                 occurrences[label] = (
                     occurrences[label] + 1 if occurrences.get(label) is not None else 1
