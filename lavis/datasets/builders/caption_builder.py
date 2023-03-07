@@ -58,8 +58,8 @@ class ArtpediaFilteredBuilder(BaseDatasetBuilder):
             return dataset_cls(
                     vis_processor=vis_processor,
                     text_processor=text_processor,
-                    ann_paths=ann_paths,
-                    vis_root=vis_path,
+                    annotations_path=ann_paths,
+                    image_directory=vis_path,
                     filtering_threshold=filtering_threshold
                 )
         else:
